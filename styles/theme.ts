@@ -6,5 +6,6 @@ export const theme = {
     yellow: "#f3ce75",
     cream: "#e3a098",
     white: "white",
+    violet: "#c14498",
   },
 };

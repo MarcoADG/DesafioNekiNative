@@ -15,6 +15,7 @@ import { z } from "zod";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "services/api";
 import { theme } from "styles/theme";
+import { useNavigation } from "@react-navigation/native";
 
 export const loginSchema = z.object({
   username: z.string().min(1, "Por favor, preencha todos os campos."),
@@ -28,6 +29,8 @@ export default function SignInForm() {
   const [savePassword, setSavePassword] = useState(false);
   const [isCheckedShow, setIsCheckedShow] = useState(false);
   const [isCheckedSave, setIsCheckedSave] = useState(false);
+
+  const navigation = useNavigation();
 
   const loginForm = useForm({
     resolver: zodResolver(loginSchema),
@@ -53,16 +56,18 @@ export default function SignInForm() {
 
   const handleLoginSubmit = async (data) => {
     try {
-      const response = await api.post("http://seu_api_url/login/signin", {
+      const response = await api.post("login/signin", {
         username: data.username,
         password: data.password,
       });
       const token = response.data.accessToken;
       await AsyncStorage.setItem("token", token);
+      console.log("data", response.data);
       const decoded = jwtDecode(token);
-      const userId = response.data.id;
+      const userId = String(response.data.id);
       await AsyncStorage.setItem("id", userId);
       Alert.alert("Login successful", `Welcome ${data.username}`);
+      navigation.navigate("Skill");
     } catch (error) {
       loginForm.setError("username", {
         message: "Credenciais inválidas. Por favor, tente novamente.",
@@ -97,7 +102,9 @@ export default function SignInForm() {
               placeholder="Login"
             />
             {loginForm.formState.errors.username && (
-              <Text>{loginForm.formState.errors.username.message}</Text>
+              <Text style={styles.textError}>
+                {loginForm.formState.errors.username.message}
+              </Text>
             )}
           </View>
         )}
@@ -117,7 +124,9 @@ export default function SignInForm() {
               secureTextEntry={!showPassword}
             />
             {loginForm.formState.errors.password && (
-              <Text>{loginForm.formState.errors.password.message}</Text>
+              <Text style={styles.textError}>
+                {loginForm.formState.errors.password.message}
+              </Text>
             )}
           </View>
         )}
@@ -150,8 +159,12 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.colors.dark_blue,
     width: 300,
     padding: 20,
+    borderRadius: 5,
   },
   text: { color: theme.colors.white },
+  textError: {
+    color: "#FF0000",
+  },
   input: {
     backgroundColor: theme.colors.cream,
     padding: 5,
