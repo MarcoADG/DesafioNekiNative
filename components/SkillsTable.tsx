@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -55,33 +55,37 @@ export default function SkillsTable({
   sortValue,
   onImageClick,
 }: SkillsTableProps) {
+  const [editedLevels, setEditedLevels] = useState<{ [key: number]: string }>(
+    {}
+  );
+
   const handleLevelChange = (id: number, value: string) => {
-    const updatedSkills = skills.map((skill) => {
-      if (skill.id === id) {
-        return {
-          ...skill,
-          level: value,
-        };
-      }
-      return skill;
-    });
-    setSkills(updatedSkills);
+    setEditedLevels((prevLevels) => ({
+      ...prevLevels,
+      [id]: value,
+    }));
   };
 
   const handleKeyPress = async (id: number) => {
+    const newLevel = editedLevels[id];
+    if (newLevel === undefined) {
+      console.error("No new level set for skill.");
+      return;
+    }
+
     const skillToUpdate = skills.find((skill) => skill.id === id);
     if (!skillToUpdate) {
       console.error("Skill not found.");
       return;
     }
 
-    const { id: skillId, level } = skillToUpdate;
+    const { id: skillId } = skillToUpdate;
     const usuarioId = await AsyncStorage.getItem("id");
     const token = await AsyncStorage.getItem("token");
     const requestData = {
       usuarioId,
       skillId,
-      level,
+      level: newLevel,
     };
 
     api
@@ -92,6 +96,7 @@ export default function SkillsTable({
       })
       .then((response) => {
         console.log("Skill updated successfully:", response.data);
+        // Optionally update the skill level in the skills array here
       })
       .catch((error) => {
         console.error("Error updating skill:", error);
@@ -107,7 +112,6 @@ export default function SkillsTable({
         },
       });
       console.log("Skill deleted successfully with ID:", id);
-      fetchData(currentPage);
     } catch (error) {
       console.error("Error deleting skill:", error);
     }
@@ -142,14 +146,19 @@ export default function SkillsTable({
                 <Text style={styles.title}>{item.nome}</Text>
                 <Text style={styles.description}>{item.descricao}</Text>
                 <TextInput
-                  value={item.level.toString()}
+                  value={editedLevels[item.id]}
+                  placeholder={item.level.toString()}
+                  placeholderTextColor={"white"}
                   onChangeText={(text) => handleLevelChange(item.id, text)}
                   onSubmitEditing={() => handleKeyPress(item.id)}
                   style={styles.infoInput}
                 />
               </View>
               <View style={styles.modifyContainer}>
-                <TouchableOpacity style={styles.modificarButtons}>
+                <TouchableOpacity
+                  style={styles.modificarButtons}
+                  onPress={() => handleLevelChange}
+                >
                   <Text style={styles.modificarTexto}>Modificar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity

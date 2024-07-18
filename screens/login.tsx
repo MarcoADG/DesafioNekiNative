@@ -72,7 +72,7 @@ export const styles = StyleSheet.create({
     overflow: "hidden",
   },
   Line: {
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: "black",
   },
   Text: {

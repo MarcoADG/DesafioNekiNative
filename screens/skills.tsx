@@ -103,6 +103,7 @@ export default function Skills() {
           onImageClick={handleImageClick}
         />
       </View>
+      <View style={styles.Line}></View>
       <View style={styles.containerBot}>
         <SkillItem skillId={selectedSkillId} />
       </View>
@@ -113,6 +114,10 @@ export default function Skills() {
 export const styles = StyleSheet.create({
   container: {
     backgroundColor: "gray",
+  },
+  Line: {
+    borderWidth: 1,
+    borderColor: "black",
   },
   containerTop: {
     backgroundColor: theme.colors.violet,
