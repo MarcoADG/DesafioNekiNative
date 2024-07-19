@@ -54,6 +54,7 @@ export default function SkillsTable({
   searchValue,
   sortValue,
   onImageClick,
+  onDelete,
 }: SkillsTableProps) {
   const [editedLevels, setEditedLevels] = useState<{ [key: number]: string }>(
     {}
@@ -113,6 +114,7 @@ export default function SkillsTable({
         },
       });
       console.log("Skill deleted successfully with ID:", id);
+      onDelete();
     } catch (error) {
       console.error("Error deleting skill:", error);
     }
@@ -164,7 +166,7 @@ export default function SkillsTable({
                 <TextInput
                   value={editedLevels[item.id]}
                   placeholder={item.level.toString()}
-                  placeholderTextColor={"white"}
+                  placeholderTextColor={"black"}
                   onChangeText={(text) => handleLevelChange(item.id, text)}
                   onSubmitEditing={() => handleKeyPress(item.id)}
                   style={styles.infoInput}
@@ -270,6 +272,7 @@ const styles = StyleSheet.create({
     padding: 8,
     color: "white",
     borderColor: theme.colors.light_blue,
+    backgroundColor: theme.colors.cream,
   },
   deleteText: {
     color: "red",

@@ -1,9 +1,11 @@
+import { AntDesign, Entypo } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import AddSkillModal from "components/Modal";
 import SkillItem from "components/Skill";
 import SkillsTable, { Skill } from "components/SkillsTable";
 import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import api from "services/api";
 import { theme } from "styles/theme";
@@ -16,8 +18,17 @@ export default function Skills() {
   const [searchValue, setSearchValue] = useState<string>("");
   const [sortValue, setSortValue] = useState<string>("");
   const [selectedSkillId, setSelectedSkillId] = useState<number | null>(null);
+  const [isModalVisible, setModalVisible] = useState(false);
 
   const navigation = useNavigation();
+
+  const handleOpenModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
 
   const fetchData = async (page = 0, search = "", sort = "", size = 3) => {
     try {
@@ -62,6 +73,11 @@ export default function Skills() {
     }
   };
 
+  const handleLogOut = () => {
+    navigation.navigate("Login");
+    AsyncStorage.removeItem("token");
+  };
+
   useEffect(() => {
     fetchData(currentPage, searchValue, sortValue, itemsPerPage);
   }, [currentPage, searchValue, sortValue, itemsPerPage]);
@@ -99,6 +115,9 @@ export default function Skills() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.containerTop}>
+        <TouchableOpacity style={styles.logOutIcon} onPress={handleLogOut}>
+          <Entypo name="log-out" size={20} color="black" />
+        </TouchableOpacity>
         <SkillsTable
           skills={skills}
           onLevelChange={setSkills}
@@ -118,7 +137,21 @@ export default function Skills() {
       </View>
       <View style={styles.Line}></View>
       <View style={styles.containerBot}>
-        <SkillItem skillId={selectedSkillId} />
+        <View style={styles.skillContainer}>
+          <SkillItem skillId={selectedSkillId} />
+        </View>
+        <View style={styles.modalContainer}>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={handleOpenModal}
+          >
+            <AntDesign name="pluscircleo" size={20} color="white" />
+          </TouchableOpacity>
+          <AddSkillModal
+            isVisible={isModalVisible}
+            onClose={handleCloseModal}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -126,11 +159,12 @@ export default function Skills() {
 
 export const styles = StyleSheet.create({
   container: {
-    backgroundColor: "gray",
+    // backgroundColor: "gray",
   },
+  logOutIcon: { paddingHorizontal: 10 },
   Line: {
     borderWidth: 1,
-    borderColor: "black",
+    borderColor: "white",
   },
   containerTop: {
     backgroundColor: theme.colors.violet,
@@ -142,11 +176,25 @@ export const styles = StyleSheet.create({
   forms: {
     alignItems: "center",
   },
+  modalButton: {
+    justifyContent: "center",
+    height: 30,
+  },
   containerBot: {
     backgroundColor: theme.colors.violet,
     borderColor: theme.colors.light_blue,
     borderWidth: 12,
     height: "30%",
     overflow: "hidden",
+  },
+  skillContainer: {
+    height: "80%",
+  },
+  modalContainer: {
+    alignItems: "center",
+    alignSelf: "center",
+    backgroundColor: theme.colors.blue,
+    width: "10%",
+    borderRadius: 30,
   },
 });

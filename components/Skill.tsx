@@ -1,19 +1,26 @@
 import { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Skill } from "./SkillsTable";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "services/api";
 import { theme } from "styles/theme";
+import AddSkillModal from "./Modal";
 
 interface SkillItemProps {
   skillId: number;
 }
+
+const gif =
+  "https://i.pinimg.com/originals/29/14/97/2914979d57cf620dbf74856235f6f704.gif";
 
 export default function SkillItem({ skillId }: SkillItemProps) {
   const [skill, setSkill] = useState<Skill | null>(null);
 
   useEffect(() => {
     const fetchSkill = async () => {
+      // if (!skillId) {
+      //   skillId = 1;
+      // }
       try {
         const token = await AsyncStorage.getItem("token");
         const response = await api.get(`associacoes/${skillId}`, {
@@ -31,7 +38,9 @@ export default function SkillItem({ skillId }: SkillItemProps) {
   }, [skillId]);
 
   if (!skill) {
-    return <Text>Loading...</Text>;
+    return (
+      <Image resizeMode="stretch" style={{ flex: 1 }} source={{ uri: gif }} />
+    );
   }
 
   return (
@@ -52,16 +61,19 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: theme.colors.dark_blue,
     borderRadius: 8,
-    margin: 10,
+    margin: 5,
     flexDirection: "row",
     gap: 30,
   },
-  containerLeft: {},
+  containerLeft: {
+    flex: 1.5,
+  },
   containerRight: {
+    flex: 2,
     justifyContent: "flex-start",
   },
   title: {
-    fontSize: 30,
+    fontSize: 20,
     color: "white",
   },
   description: {

@@ -42,11 +42,9 @@ export default function SignInForm() {
   };
 
   const handleSavePasswordChange = async () => {
+    const currentPassword = loginForm.getValues("password");
     if (!savePassword) {
-      await AsyncStorage.setItem(
-        "savedPassword",
-        loginForm.getValues("password")
-      );
+      await AsyncStorage.setItem("savedPassword", currentPassword);
     } else {
       await AsyncStorage.removeItem("savedPassword");
     }
@@ -81,6 +79,9 @@ export default function SignInForm() {
       if (savedPassword) {
         loginForm.setValue("password", savedPassword);
         setSavePassword(true);
+        setIsCheckedSave(true);
+      } else {
+        setIsCheckedSave(false);
       }
     };
     fetchSavedPassword();
