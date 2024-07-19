@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 import SkillItem from "components/Skill";
 import SkillsTable, { Skill } from "components/SkillsTable";
 import { useEffect, useState } from "react";
@@ -16,14 +17,21 @@ export default function Skills() {
   const [sortValue, setSortValue] = useState<string>("");
   const [selectedSkillId, setSelectedSkillId] = useState<number | null>(null);
 
-  const fetchData = async (page = 0, search = "", sort = "", size = 0) => {
+  const navigation = useNavigation();
+
+  const fetchData = async (page = 0, search = "", sort = "", size = 3) => {
     try {
       const token = await AsyncStorage.getItem("token");
+
+      if (!token) {
+        navigation.navigate("Login");
+      }
+
       const userId = await AsyncStorage.getItem("id");
 
       const params: { [key: string]: any } = {
         page: page,
-        size: itemsPerPage,
+        size: size,
       };
 
       if (search.trim() !== "") {
@@ -41,7 +49,12 @@ export default function Skills() {
         },
       });
 
-      setSkills(response.data.content);
+      if (response.data.content.length === 0) {
+        setSkills([]);
+      } else {
+        setSkills(response.data.content);
+      }
+
       setTotalPages(response.data.totalPages);
       setCurrentPage(page);
     } catch (error) {

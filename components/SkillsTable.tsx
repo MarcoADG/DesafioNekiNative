@@ -1,19 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TextInput,
-  Button,
+  TouchableOpacity,
   FlatList,
   Image,
-  TouchableOpacity,
   ScrollView,
   StyleSheet,
 } from "react-native";
-import { z } from "zod";
+import { Picker } from "@react-native-picker/picker";
 import api from "services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { theme } from "styles/theme";
+import { z } from "zod";
 
 const skillSchema = z.object({
   id: z.number(),
@@ -58,6 +58,7 @@ export default function SkillsTable({
   const [editedLevels, setEditedLevels] = useState<{ [key: number]: string }>(
     {}
   );
+  const [searchInputValue, setSearchInputValue] = useState(searchValue);
 
   const handleLevelChange = (id: number, value: string) => {
     setEditedLevels((prevLevels) => ({
@@ -117,6 +118,10 @@ export default function SkillsTable({
     }
   };
 
+  const handleSearchClick = () => {
+    handleSearch(searchInputValue);
+  };
+
   return (
     <>
       <ScrollView style={styles.container}>
@@ -124,15 +129,26 @@ export default function SkillsTable({
           <TextInput
             style={styles.searchBar}
             placeholder="Search"
-            onChangeText={handleSearch}
-            value={searchValue}
+            onChangeText={setSearchInputValue}
+            value={searchInputValue}
           />
-          <TextInput
-            style={styles.sortBar}
-            placeholder="Sort"
-            onChangeText={handleSortChange}
-            value={sortValue}
-          />
+          <TouchableOpacity
+            style={styles.searchButton}
+            onPress={handleSearchClick}
+          >
+            <Text style={styles.searchButtonText}>Search</Text>
+          </TouchableOpacity>
+          <Picker
+            selectedValue={sortValue}
+            style={styles.sortPicker}
+            onValueChange={(itemValue) => handleSortChange(itemValue)}
+          >
+            <Picker.Item enabled={false} label="Sort" />
+            <Picker.Item label="Name Asc" value="skills.nome,asc" />
+            <Picker.Item label="Name Desc" value="skills.nome,desc" />
+            <Picker.Item label="Level Asc" value="level,asc" />
+            <Picker.Item label="Level Desc" value="level,desc" />
+          </Picker>
         </View>
         <FlatList
           data={skills}
@@ -173,27 +189,37 @@ export default function SkillsTable({
         />
       </ScrollView>
       <View style={styles.pageButtons}>
-        <Button title="Previous" onPress={prevPage} />
-        <TextInput
-          placeholder="Items per page"
-          onChangeText={(text) => handlePagesChange(Number(text))}
-          value={itemsPerPage.toString()}
-          style={styles.pagesInput}
-        />
-        <Button title="Next" onPress={nextPage} />
+        <TouchableOpacity style={styles.pagesButton} onPress={prevPage}>
+          <Text style={styles.pageText}>Previous</Text>
+        </TouchableOpacity>
+        <Picker
+          selectedValue={itemsPerPage}
+          style={styles.pagesPicker}
+          onValueChange={(itemValue) => handlePagesChange(itemValue)}
+        >
+          <Picker.Item label="3" value={3} />
+          <Picker.Item label="4" value={4} />
+          <Picker.Item label="5" value={5} />
+          <Picker.Item label="10" value={10} />
+          <Picker.Item label="15" value={15} />
+          <Picker.Item label="20" value={20} />
+          <Picker.Item label="25" value={25} />
+        </Picker>
+        <TouchableOpacity style={styles.pagesButton} onPress={nextPage}>
+          <Text style={styles.pageText}>Next</Text>
+        </TouchableOpacity>
       </View>
     </>
   );
 }
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     padding: 10,
   },
   bars: {
     flexDirection: "row",
     marginBottom: 14,
-    gap: 8,
   },
   searchBar: {
     flex: 2,
@@ -202,10 +228,21 @@ export const styles = StyleSheet.create({
     borderColor: theme.colors.dark_blue,
     backgroundColor: theme.colors.cream,
   },
-  sortBar: {
+  searchButton: {
+    backgroundColor: theme.colors.blue,
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  searchButtonText: {
+    color: "white",
+  },
+  sortPicker: {
     flex: 1,
     borderWidth: 1,
-    padding: 5,
+    paddingHorizontal: 28,
     borderColor: theme.colors.dark_blue,
     backgroundColor: theme.colors.cream,
   },
@@ -255,17 +292,30 @@ export const styles = StyleSheet.create({
   pageButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 6,
+    alignItems: "center",
     padding: 10,
   },
-  pagesInput: {
-    borderWidth: 1,
-    padding: 8,
+  pagesPicker: {
+    flex: 1,
+    marginHorizontal: 20,
     backgroundColor: theme.colors.cream,
   },
   title: {
     fontSize: 20,
     color: "white",
+  },
+  pagesButton: {
+    backgroundColor: theme.colors.blue,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    height: 40,
+    borderRadius: 10,
+    justifyContent: "center",
+  },
+  pageText: {
+    color: "white",
+    textAlign: "center",
+    fontSize: 16,
   },
   description: {
     fontSize: 15,
