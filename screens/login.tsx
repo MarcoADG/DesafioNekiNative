@@ -73,7 +73,7 @@ export const styles = StyleSheet.create({
   },
   Line: {
     borderWidth: 1,
-    borderColor: "black",
+    borderColor: "white",
   },
   Text: {
     color: theme.colors.blue,
