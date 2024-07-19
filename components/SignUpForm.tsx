@@ -34,7 +34,7 @@ export default function SignUpForm({ setModo }: SignUpFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [isCheckedShow, setIsCheckedShow] = useState(false);
 
-  const registerForm = useForm({
+  const registerForm = useForm<RegisterFormInputs>({
     resolver: zodResolver(registerSchema),
   });
 
@@ -43,7 +43,7 @@ export default function SignUpForm({ setModo }: SignUpFormProps) {
     setShowPassword(!showPassword);
   };
 
-  const handleRegisterSubmit = async (data) => {
+  const handleRegisterSubmit = async (data: any) => {
     try {
       await api.post("login/signup", {
         login: data.username,

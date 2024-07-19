@@ -32,7 +32,7 @@ export default function SignInForm() {
 
   const navigation = useNavigation();
 
-  const loginForm = useForm({
+  const loginForm = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
   });
 
@@ -54,7 +54,7 @@ export default function SignInForm() {
     setIsCheckedSave(!isCheckedSave);
   };
 
-  const handleLoginSubmit = async (data) => {
+  const handleLoginSubmit = async (data: any) => {
     try {
       const response = await api.post("login/signin", {
         username: data.username,
